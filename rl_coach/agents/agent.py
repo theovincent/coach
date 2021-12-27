@@ -438,6 +438,13 @@ class Agent(AgentInterface):
             self.agent_logger.create_signal_value(
                 "Success Rate",
                 success_rate)
+            health = self.curr_state["measurements"][0]
+            if evaluation_reward < 2100:
+                health = 0
+            self.agent_logger.create_signal_value(
+                "Health",
+                health)
+            
 
             if self.ap.task_parameters.evaluate_only is None:
                 # TODO verbosity was mistakenly removed from task_parameters on release 0.11.0, need to bring it back
@@ -544,6 +551,8 @@ class Agent(AgentInterface):
         self.agent_logger.create_signal_value('Doubly Robust', np.nan, overwrite=False)
         self.agent_logger.create_signal_value('Weighted Importance Sampling', np.nan, overwrite=False)
         self.agent_logger.create_signal_value('Sequential Doubly Robust', np.nan, overwrite=False)
+        self.agent_logger.create_signal_value('Health', np.nan, overwrite=False)
+
 
         for signal in self.episode_signals:
             self.agent_logger.create_signal_value("{}/Mean".format(signal.name), signal.get_mean())
