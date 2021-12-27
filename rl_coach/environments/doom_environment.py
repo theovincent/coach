@@ -26,6 +26,7 @@ from os import path, environ
 from typing import Union, List
 
 import numpy as np
+from PIL import Image, ImageDraw
 
 from rl_coach.base_parameters import VisualizationParameters
 from rl_coach.environments.environment import Environment, EnvironmentParameters, LevelSelection
@@ -108,7 +109,7 @@ class DoomEnvironmentParameters(EnvironmentParameters):
         super().__init__(level=level)
         self.default_input_filter = DoomInputFilter
         self.default_output_filter = DoomOutputFilter
-        self.cameras = [DoomEnvironment.CameraTypes.OBSERVATION]
+        self.cameras = [DoomEnvironment.CameraTypes.OBSERVATION, DoomEnvironment.CameraTypes.DEPTH, DoomEnvironment.CameraTypes.LABELS, DoomEnvironment.CameraTypes.MAP]
 
     @property
     def path(self):
@@ -262,7 +263,13 @@ class DoomEnvironment(Environment):
         """
         image = [self.state[camera.value[0]] for camera in self.cameras]
         image = np.vstack(image)
-        return image
+        
+        pil_image = Image.fromarray(image)        
+        drawer = ImageDraw.Draw(pil_image)
+        
+        drawer.text((10,10), f"Health :{self.state['measurements'][0]}", fill=(255,255,0))
+
+        return np.array(pil_image)
 
     def get_target_success_rate(self) -> float:
         return self.target_success_rate
