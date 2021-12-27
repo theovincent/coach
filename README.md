@@ -358,3 +358,43 @@ The Coach development team can also be contacted over [email](mailto:coach@intel
 
 Coach is released as a reference code for research purposes. It is not an official Intel product, and the level of quality and support may not be as expected from an official product. 
 Additional algorithms and environments are planned to be added to the framework. Feedback and contributions from the open source and RL research communities are more than welcome.
+
+
+## With GCP Compute Engine
+Connect to the virtual machine and copy the .ssh folder to ubuntu user.
+Connect from local host by ssh with ubuntu user.
+Clone repository this at /home/theovincent/MVA/ObjectRecognition/LearningToAct/
+Open the devcontainer from vs-code.
+Create a virtual environment and install coach has an editable package.
+export VIZDOOM_ROOT=/home/developer/LearningToAct/ViZDoom
+
+```Bash
+# Build a VM with compute engine having debian bullseye (same as Dockerfile), http(s) connections and remove vTPM security but allow your ssh public key.
+# Set .ssh/config locally so that we launch at IP with theo.vincent
+ssh DirectFuturePredictionTrain
+# Download docker
+sudo apt-get update
+sudo apt-get install docker.io htop -y
+# Allow non-root user to use it
+sudo chmod 666 /var/run/docker.sock
+sudo mkdir -p /home/theovincent/MVA/ObjectRecognition/LearningToAct/
+sudo chown -R theo.vincent:theo.vincent ../theovincent/
+cd /home/theovincent/MVA/ObjectRecognition/LearningToAct/
+git clone git@github.com:theovincent/coach.git
+cd coach
+git checkout # Lastest branch
+cd ..
+git clone git@github.com:mwydmuch/ViZDoom.git
+# Open the devcontainer from vs-code to build the dev-container in the folder coach
+python -m venv env_container
+source env_container/bin/activate
+pip install --upgrade pip
+pip install -e .
+echo "export VIZDOOM_ROOT=/home/developer/LearningToAct/ViZDoom" >> ~/.bashrc
+cd ..
+# For GPU usage only
+curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py
+# Remove linux-headers-{kernel_version} line 243 from the installed packages
+sudo python3 install_gpu_driver.py 
+sudo apt install cuda
+```pip install -e .
