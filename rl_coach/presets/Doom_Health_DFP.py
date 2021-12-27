@@ -16,8 +16,7 @@ from rl_coach.schedules import LinearSchedule
 ####################
 
 schedule_params = ScheduleParameters()
-# schedule_params.improve_steps = EnvironmentSteps(6250000)
-schedule_params.improve_steps = EnvironmentSteps(625)
+schedule_params.improve_steps = EnvironmentSteps(6250000)
 # original paper evaluates according to these. But, this preset converges significantly faster - can be evaluated
 # much often.
 # schedule_params.steps_between_evaluation_periods = EnvironmentSteps(62500)
