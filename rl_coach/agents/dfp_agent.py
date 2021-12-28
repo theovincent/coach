@@ -43,19 +43,11 @@ class DFPNetworkParameters(NetworkParameters):
         super().__init__()
         self.input_embedders_parameters = {
             "observation": InputEmbedderParameters(activation_function="leaky_relu"),
-            "depth": InputEmbedderParameters(activation_function="leaky_relu"),
             "measurements": InputEmbedderParameters(activation_function="leaky_relu"),
             "goal": InputEmbedderParameters(activation_function="leaky_relu"),
         }
 
         self.input_embedders_parameters["observation"].scheme = [
-            Conv2d(32, 8, 4),
-            Conv2d(64, 4, 2),
-            Conv2d(64, 3, 1),
-            Dense(512),
-        ]
-
-        self.input_embedders_parameters["depth"].scheme = [
             Conv2d(32, 8, 4),
             Conv2d(64, 4, 2),
             Conv2d(64, 3, 1),

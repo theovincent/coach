@@ -102,24 +102,29 @@ DoomInputFilter.add_observation_filter("observation", "to_grayscale", Observatio
 DoomInputFilter.add_observation_filter("observation", "to_uint8", ObservationToUInt8Filter(0, 255))
 DoomInputFilter.add_observation_filter("observation", "stacking", ObservationStackingFilter(3))
 
-DoomInputFilter.add_observation_filter(
-    "depth", "rescaling", ObservationRescaleToSizeFilter(ImageObservationSpace(np.array([60, 76, 3]), high=255))
-)
-DoomInputFilter.add_observation_filter("depth", "to_grayscale", ObservationRGBToYFilter())
-DoomInputFilter.add_observation_filter("depth", "to_uint8", ObservationToUInt8Filter(0, 255))
-DoomInputFilter.add_observation_filter("depth", "stacking", ObservationStackingFilter(3))
-
 
 DoomOutputFilter = OutputFilter(is_a_reference_filter=True)
 DoomOutputFilter.add_action_filter("to_discrete", FullDiscreteActionSpaceMap())
 
 
 class DoomEnvironmentParameters(EnvironmentParameters):
-    def __init__(self, level=None):
+    def __init__(self, level=None, additional_inputs=[]):
         super().__init__(level=level)
+        self.cameras = [DoomEnvironment.CameraTypes.OBSERVATION]
+
+        if "depth" in additional_inputs:
+            self.cameras.append(DoomEnvironment.CameraTypes.DEPTH)
+            DoomInputFilter.add_observation_filter(
+                "depth",
+                "rescaling",
+                ObservationRescaleToSizeFilter(ImageObservationSpace(np.array([60, 76, 3]), high=255)),
+            )
+            DoomInputFilter.add_observation_filter("depth", "to_grayscale", ObservationRGBToYFilter())
+            DoomInputFilter.add_observation_filter("depth", "to_uint8", ObservationToUInt8Filter(0, 255))
+            DoomInputFilter.add_observation_filter("depth", "stacking", ObservationStackingFilter(3))
+
         self.default_input_filter = DoomInputFilter
         self.default_output_filter = DoomOutputFilter
-        self.cameras = [DoomEnvironment.CameraTypes.OBSERVATION, DoomEnvironment.CameraTypes.DEPTH]
 
     @property
     def path(self):
