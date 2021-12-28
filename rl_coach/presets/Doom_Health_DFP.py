@@ -7,9 +7,12 @@ from rl_coach.base_parameters import (
 )
 from rl_coach.core_types import EnvironmentSteps, EnvironmentEpisodes
 from rl_coach.environments.doom_environment import DoomEnvironmentParameters
+from rl_coach.architectures.embedder_parameters import InputEmbedderParameters
 from rl_coach.graph_managers.basic_rl_graph_manager import BasicRLGraphManager
 from rl_coach.graph_managers.graph_manager import ScheduleParameters
 from rl_coach.schedules import LinearSchedule
+
+ADDITIONAL_INPUTS = []
 
 ####################
 # Graph Scheduling #
@@ -46,7 +49,11 @@ agent_params.network_wrappers["main"].input_embedders_parameters["measurements"]
 
 # changing the network scheme to match Coach's default network, as it performs better on this preset
 agent_params.network_wrappers["main"].input_embedders_parameters["observation"].scheme = EmbedderScheme.Medium
-agent_params.network_wrappers["main"].input_embedders_parameters["depth"].scheme = EmbedderScheme.Medium
+if "depth" in ADDITIONAL_INPUTS:
+    agent_params.network_wrappers["main"].input_embedders_parameters["depth"] = InputEmbedderParameters(
+        activation_function="leaky_relu"
+    )
+    agent_params.network_wrappers["main"].input_embedders_parameters["depth"].scheme = EmbedderScheme.Medium
 agent_params.network_wrappers["main"].input_embedders_parameters["measurements"].scheme = EmbedderScheme.Empty
 agent_params.network_wrappers["main"].input_embedders_parameters["goal"].scheme = EmbedderScheme.Empty
 agent_params.network_wrappers["main"].middleware_parameters.scheme = MiddlewareScheme.Medium
@@ -57,7 +64,7 @@ agent_params.algorithm.scale_measurements_targets["GameVariable.HEALTH"] = 30.0
 ###############
 # Environment #
 ###############
-env_params = DoomEnvironmentParameters(level="HEALTH_GATHERING")
+env_params = DoomEnvironmentParameters(level="HEALTH_GATHERING", additional_inputs=ADDITIONAL_INPUTS)
 
 
 ########
