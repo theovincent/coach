@@ -51,6 +51,9 @@ class DoomLevel(Enum):
     HEALTH_GATHERING_SUPREME_COACH_LOCAL = (
         "D2_navigation.cfg"  # from https://github.com/IntelVCL/DirectFuturePrediction/tree/master/maps
     )
+    HEALTH_GATHERING_SUPREME_NO_SPAWN_COACH_LOCAL = (
+        "D2_navigation_no_spawn.cfg"  # from https://github.com/IntelVCL/DirectFuturePrediction/tree/master/maps
+    )
     DEFEND_THE_LINE = "defend_the_line.cfg"
     DEADLY_CORRIDOR = "deadly_corridor.cfg"
     BATTLE_COACH_LOCAL = "D3_battle.cfg"  # from https://github.com/IntelVCL/DirectFuturePrediction/tree/master/maps
@@ -108,9 +111,10 @@ DoomOutputFilter.add_action_filter("to_discrete", FullDiscreteActionSpaceMap())
 
 
 class DoomEnvironmentParameters(EnvironmentParameters):
-    def __init__(self, level=None, additional_inputs=[]):
+    def __init__(self, level=None, additional_inputs=[], from_pix2pix=False):
         super().__init__(level=level)
         self.cameras = [DoomEnvironment.CameraTypes.OBSERVATION]
+        self.from_pix2pix = from_pix2pix
 
         if "depth" in additional_inputs:
             self.cameras.append(DoomEnvironment.CameraTypes.DEPTH)
@@ -148,6 +152,7 @@ class DoomEnvironment(Environment):
         visualization_parameters: VisualizationParameters,
         cameras: List[CameraTypes],
         target_success_rate: float = 1.0,
+        from_pix2pix=False,
         **kwargs,
     ):
         """
@@ -191,6 +196,14 @@ class DoomEnvironment(Environment):
         )
 
         self.cameras = cameras
+        self.from_pix2pix = from_pix2pix
+
+        if self.from_pix2pix:
+            from rl_coach.architectures.pix2pix import Pix2Pix
+
+            self.pix2pix = Pix2Pix()
+        else:
+            self.pix2pix = None
 
         # load the emulator with the required level
         self.level = DoomLevel[level.upper()]
@@ -221,6 +234,9 @@ class DoomEnvironment(Environment):
         self.game.set_render_decals(False)
         self.game.set_render_particles(False)
         for camera in self.cameras:
+            # Prevent the game to give the "real" depth frame.
+            if camera == DoomEnvironment.CameraTypes.DEPTH and self.from_pix2pix:
+                continue
             if hasattr(self.game, "set_{}_enabled".format(camera.value[1])):
                 getattr(self.game, "set_{}_enabled".format(camera.value[1]))(True)
         self.game.init()
@@ -277,7 +293,10 @@ class DoomEnvironment(Environment):
             self.measurements = state.game_variables
             self.state = {"measurements": self.measurements}
             for camera in self.cameras:
-                observation = getattr(state, camera.value[1])
+                if camera == DoomEnvironment.CameraTypes.DEPTH and self.from_pix2pix:
+                    observation = self.pix2pix(getattr(state, "screen_buffer"))
+                else:
+                    observation = getattr(state, camera.value[1])
                 if len(observation.shape) == 3:
                     self.state[camera.value[0]] = np.transpose(observation, (1, 2, 0))
                 elif len(observation.shape) == 2:
@@ -285,6 +304,10 @@ class DoomEnvironment(Environment):
 
         self.reward = self.game.get_last_reward()
         self.done = self.game.is_episode_finished()
+        # import time
+
+        # if not self.from_pix2pix:
+        #     time.sleep(0.1)
 
     def _take_action(self, action):
         self.game.make_action(list(action), self.frame_skip)
@@ -307,6 +330,24 @@ class DoomEnvironment(Environment):
         drawer.text(
             (self.game.get_screen_width() - 100, 10), f"Step :{self.current_episode_steps_counter}", fill=(255, 255, 0)
         )
+
+        # if (
+        #     np.random.random() < 0.1
+        #     and len(os.listdir("../pytorch-CycleGAN-and-pix2pix/Doom_Heatlh_Supreme/A/")) <= 3000
+        # ):
+        #     idx_image = len(os.listdir("../pytorch-CycleGAN-and-pix2pix/Doom_Heatlh_Supreme/A/"))
+
+        #     observation = self.state["observation"]
+        #     r, g, b = observation[:, :, 0], observation[:, :, 1], observation[:, :, 2]
+        #     observation = 0.2989 * r + 0.5870 * g + 0.1140 * b
+        #     observation_pil = Image.fromarray(observation.astype(np.uint8))
+        #     observation_pil.save(f"../pytorch-CycleGAN-and-pix2pix/Doom_Heatlh_Supreme/A/{idx_image}.jpg")
+
+        #     depth = self.state["depth"]
+        #     r, g, b = depth[:, :, 0], depth[:, :, 1], depth[:, :, 2]
+        #     depth = 0.2989 * r + 0.5870 * g + 0.1140 * b
+        #     depth_pil = Image.fromarray(depth.astype(np.uint8))
+        #     depth_pil.save(f"../pytorch-CycleGAN-and-pix2pix/Doom_Heatlh_Supreme/B/{idx_image}.jpg")
 
         return np.array(pil_image)
 

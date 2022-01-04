@@ -13,6 +13,7 @@ from rl_coach.graph_managers.graph_manager import ScheduleParameters
 from rl_coach.schedules import LinearSchedule
 
 ADDITIONAL_INPUTS = ["depth"]
+from_pix2pix = False
 
 ####################
 # Graph Scheduling #
@@ -70,7 +71,9 @@ agent_params.algorithm.scale_measurements_targets["GameVariable.HEALTH"] = 30.0
 # Environment #
 ###############
 env_params = DoomEnvironmentParameters(
-    level="HEALTH_GATHERING_SUPREME_NO_SPAWN_COACH_LOCAL", additional_inputs=ADDITIONAL_INPUTS
+    level="HEALTH_GATHERING_SUPREME_NO_SPAWN_COACH_LOCAL",
+    additional_inputs=ADDITIONAL_INPUTS,
+    from_pix2pix=from_pix2pix,
 )
 
 
