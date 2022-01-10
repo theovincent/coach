@@ -23,7 +23,7 @@ import numpy as np
 from rl_coach.agents.agent import Agent
 from rl_coach.architectures.head_parameters import MeasurementsPredictionHeadParameters
 from rl_coach.architectures.embedder_parameters import InputEmbedderParameters
-from rl_coach.architectures.middleware_parameters import FCMiddlewareParameters
+from rl_coach.architectures.middleware_parameters import FCMiddlewareParameters, LSTMMiddlewareParameters
 from rl_coach.architectures.tensorflow_components.layers import Conv2d, Dense
 from rl_coach.base_parameters import AlgorithmParameters, AgentParameters, NetworkParameters, MiddlewareScheme
 from rl_coach.core_types import ActionInfo, EnvironmentSteps, RunPhase
@@ -39,7 +39,7 @@ class HandlingTargetsAfterEpisodeEnd(Enum):
 
 
 class DFPNetworkParameters(NetworkParameters):
-    def __init__(self):
+    def __init__(self, middleware_lstm=False):
         super().__init__()
         self.input_embedders_parameters = {
             "observation": InputEmbedderParameters(activation_function="leaky_relu"),
@@ -66,9 +66,14 @@ class DFPNetworkParameters(NetworkParameters):
             Dense(128),
         ]
 
-        self.middleware_parameters = FCMiddlewareParameters(
-            activation_function="leaky_relu", scheme=MiddlewareScheme.Empty
-        )
+        if middleware_lstm:
+            self.middleware_parameters = LSTMMiddlewareParameters(
+                activation_function="leaky_relu", scheme=MiddlewareScheme.Empty
+            )
+        else:
+            self.middleware_parameters = FCMiddlewareParameters(
+                activation_function="leaky_relu", scheme=MiddlewareScheme.Empty
+            )
         self.heads_parameters = [MeasurementsPredictionHeadParameters(activation_function="leaky_relu")]
         self.async_training = False
         self.batch_size = 64
@@ -126,12 +131,12 @@ class DFPAlgorithmParameters(AlgorithmParameters):
 
 
 class DFPAgentParameters(AgentParameters):
-    def __init__(self):
+    def __init__(self, middleware_lstm=False):
         super().__init__(
             algorithm=DFPAlgorithmParameters(),
             exploration=EGreedyParameters(),
             memory=DFPMemoryParameters(),
-            networks={"main": DFPNetworkParameters()},
+            networks={"main": DFPNetworkParameters(middleware_lstm=middleware_lstm)},
         )
 
     @property

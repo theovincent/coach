@@ -13,7 +13,8 @@ from rl_coach.graph_managers.graph_manager import ScheduleParameters
 from rl_coach.schedules import LinearSchedule
 
 ADDITIONAL_INPUTS = ["depth"]
-from_pix2pix = False
+from_pix2pix = True
+middleware_lstm = True
 
 ####################
 # Graph Scheduling #
@@ -33,7 +34,7 @@ schedule_params.evaluation_steps = EnvironmentEpisodes(1)
 #########
 # Agent #
 #########
-agent_params = DFPAgentParameters()
+agent_params = DFPAgentParameters(middleware_lstm=middleware_lstm)
 schedule_params.heatup_steps = EnvironmentSteps(agent_params.network_wrappers["main"].batch_size)
 
 agent_params.network_wrappers["main"].learning_rate = 0.0001
