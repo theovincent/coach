@@ -236,6 +236,8 @@ class DoomEnvironment(Environment):
         for camera in self.cameras:
             # Prevent the game to give the "real" depth frame.
             if camera == DoomEnvironment.CameraTypes.DEPTH and self.from_pix2pix:
+                # To compare pix2pix with the ground truth
+                # getattr(self.game, "set_{}_enabled".format(camera.value[1]))(True)
                 continue
             if hasattr(self.game, "set_{}_enabled".format(camera.value[1])):
                 getattr(self.game, "set_{}_enabled".format(camera.value[1]))(True)
@@ -302,12 +304,18 @@ class DoomEnvironment(Environment):
                 elif len(observation.shape) == 2:
                     self.state[camera.value[0]] = np.repeat(np.expand_dims(observation, -1), 3, axis=-1)
 
+                # To compare pix2pix with the ground truth
+                # if camera == DoomEnvironment.CameraTypes.DEPTH:
+                #     self.state[camera.value[0] + "_true"] = np.repeat(
+                #         np.expand_dims(getattr(state, camera.value[1]), -1), 3, axis=-1
+                #     )
+
         self.reward = self.game.get_last_reward()
         self.done = self.game.is_episode_finished()
-        # import time
+        import time
 
-        # if not self.from_pix2pix:
-        #     time.sleep(0.1)
+        if not self.from_pix2pix:
+            time.sleep(0.3)
 
     def _take_action(self, action):
         self.game.make_action(list(action), self.frame_skip)
@@ -322,6 +330,8 @@ class DoomEnvironment(Environment):
         :return: numpy array containing the image that will be rendered to the screen
         """
         image = [self.state[camera.value[0]] for camera in self.cameras]
+        # To compare pix2pix with the ground truth
+        # image.append(self.state[self.cameras[1].value[0] + "_true"])
         image = np.vstack(image)
 
         pil_image = Image.fromarray(image)
