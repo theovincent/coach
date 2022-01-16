@@ -14,7 +14,7 @@ from rl_coach.schedules import LinearSchedule
 
 ADDITIONAL_INPUTS = []
 from_pix2pix = False
-middleware_lstm = True
+middleware_lstm = False
 
 ####################
 # Graph Scheduling #
