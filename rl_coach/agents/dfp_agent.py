@@ -132,6 +132,7 @@ class DFPAlgorithmParameters(AlgorithmParameters):
 
 class DFPAgentParameters(AgentParameters):
     def __init__(self, middleware_lstm=False):
+        self.middleware_lstm = middleware_lstm
         super().__init__(
             algorithm=DFPAlgorithmParameters(),
             exploration=EGreedyParameters(),

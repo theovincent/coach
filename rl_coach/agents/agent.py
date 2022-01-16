@@ -732,9 +732,12 @@ class Agent(AgentInterface):
 
             # we either go sequentially through the entire replay buffer in the batch RL mode,
             # or sample randomly for the basic RL case.
-            training_schedule = self.call_memory('get_shuffled_training_data_generator', batch_size) if \
-                self.ap.is_batch_rl_training else [self.call_memory('sample', batch_size) for _ in
-                                      range(self.ap.algorithm.num_consecutive_training_steps)]
+            if self.ap.middleware_lstm:
+                training_schedule = [self.call_memory('sample', (batch_size, True))]
+            else:
+                training_schedule = self.call_memory('get_shuffled_training_data_generator', batch_size) if \
+                    self.ap.is_batch_rl_training else [self.call_memory('sample', batch_size) for _ in
+                                        range(self.ap.algorithm.num_consecutive_training_steps)]
 
             for batch in training_schedule:
                 # update counters

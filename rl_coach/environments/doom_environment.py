@@ -312,10 +312,10 @@ class DoomEnvironment(Environment):
 
         self.reward = self.game.get_last_reward()
         self.done = self.game.is_episode_finished()
-        import time
+        # import time
 
-        if not self.from_pix2pix:
-            time.sleep(0.3)
+        # if not self.from_pix2pix:
+        #     time.sleep(0.1)
 
     def _take_action(self, action):
         self.game.make_action(list(action), self.frame_skip)
