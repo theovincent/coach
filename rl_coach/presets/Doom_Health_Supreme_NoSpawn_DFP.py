@@ -35,6 +35,8 @@ schedule_params.evaluation_steps = EnvironmentEpisodes(1)
 # Agent #
 #########
 agent_params = DFPAgentParameters(middleware_lstm=middleware_lstm)
+if middleware_lstm:
+    agent_params.network_wrappers["main"].batch_size = 10
 schedule_params.heatup_steps = EnvironmentSteps(agent_params.network_wrappers["main"].batch_size)
 
 agent_params.network_wrappers["main"].learning_rate = 0.0001
