@@ -4,7 +4,7 @@ This work is an extension of [Coach-RL](https://github.com/IntelLabs/coach). The
 
 You can have a look to the report that I have made [here](./ViZDoom.pdf).
 
-In short, adding information helped the agent to learn a better behavior in a small amount of training steps (~ 200 000 steps). Indeed, the agent with only 3 frames, on the top left, as input is lost and does not know where to go. On the contrary, the other agents understand that they have to search for medkits.
+In short, adding information helped the agent to learn a better behavior in a small amount of training steps (~ 200 000 steps). Indeed, the agent with only 3 frames as input (on the top left) is lost and does not know where to go. On the contrary, the other agents understand that they have to search for medkits.
 
 <table style="width:100%; table-layout:fixed;">
 	<tr>
