@@ -1,5 +1,29 @@
-# Coach
+# Enhancement of Direct Future Prediction by adding time and memory information
 
+This work is an extension of [Coach-RL](https://github.com/IntelLabs/coach). The idea is to study how can we improve the algorithm Direct Future Prediction by adding depth information and time information. 
+
+You can have a look to the report that I have made [here](./ViZDoom.pdf).
+
+<table style="width:100%; table-layout:fixed;">
+	<tr>
+		<td><img width="400px" src="gif/3Frames.gif"></td>
+		<td><img width="400px" src="gif/3FramesDepth.gif"></td>
+	</tr>
+	<tr>
+		<td>Input: 3 frames (like in the original paper)</td>
+		<td>Input: 3 frames + depth from the game engine</td>
+	</tr>
+	<tr>
+		<td><img width="400px" src="gif/3FramesDepthpix2pix.gif"></td>
+		<td><img width="400px" src="gif/10Frames.gif"></td>
+	</tr>
+	<tr>
+		<td>Input: 3 frames + depth predicted with pix2pix</td>
+		<td>Input: 10 frames</td>
+	</tr>
+</table>
+
+# Coach
 [![CI](https://img.shields.io/circleci/build/github/IntelLabs/coach/master.svg)](https://circleci.com/gh/IntelLabs/workflows/coach/tree/master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/IntelLabs/coach/blob/master/LICENSE)
 [![Docs](https://readthedocs.org/projects/carla/badge/?version=latest)](https://intellabs.github.io/coach/)
