@@ -103,7 +103,7 @@ DoomInputFilter.add_observation_filter(
 )
 DoomInputFilter.add_observation_filter("observation", "to_grayscale", ObservationRGBToYFilter())
 DoomInputFilter.add_observation_filter("observation", "to_uint8", ObservationToUInt8Filter(0, 255))
-DoomInputFilter.add_observation_filter("observation", "stacking", ObservationStackingFilter(10))
+DoomInputFilter.add_observation_filter("observation", "stacking", ObservationStackingFilter(3))
 
 
 DoomOutputFilter = OutputFilter(is_a_reference_filter=True)

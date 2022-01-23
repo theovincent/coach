@@ -12,8 +12,8 @@ from rl_coach.graph_managers.basic_rl_graph_manager import BasicRLGraphManager
 from rl_coach.graph_managers.graph_manager import ScheduleParameters
 from rl_coach.schedules import LinearSchedule
 
-ADDITIONAL_INPUTS = []
-from_pix2pix = False
+ADDITIONAL_INPUTS = ["depth"]
+from_pix2pix = True
 middleware_lstm = False
 
 ####################
