@@ -25,7 +25,7 @@ WORKDIR /home/developer/LearningToAct/
 RUN sudo apt -y install cmake libboost-all-dev libsdl2-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libpng-dev libjpeg-dev libbz2-dev libfluidsynth-dev libgme-dev libopenal-dev zlib1g-dev timidity tar nasm
 
 # General
-RUN sudo -E apt-get install python3-pip cmake zlib1g-dev python3-tk python3-opencv -y
+RUN sudo apt-get update && sudo -E apt-get install python3-pip cmake zlib1g-dev python3-tk python3-opencv -y
 
 # Boost libraries
 RUN sudo -E apt-get install libboost-all-dev -y
@@ -35,5 +35,8 @@ RUN sudo -E apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
 
 # PyGame
 RUN sudo -E apt-get install libsdl-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsmpeg-dev libportmidi-dev libavformat-dev libswscale-dev -y
+
+# For storing videos
+RUN sudo -E apt install ffmpeg -y
 
 USER $USERNAME

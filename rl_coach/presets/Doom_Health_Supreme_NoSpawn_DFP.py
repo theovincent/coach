@@ -12,8 +12,8 @@ from rl_coach.graph_managers.basic_rl_graph_manager import BasicRLGraphManager
 from rl_coach.graph_managers.graph_manager import ScheduleParameters
 from rl_coach.schedules import LinearSchedule
 
-ADDITIONAL_INPUTS = []
-from_pix2pix = False
+ADDITIONAL_INPUTS = ["depth"]
+from_pix2pix = True
 middleware_lstm = False
 
 ####################
@@ -67,7 +67,6 @@ else:
     agent_params.network_wrappers["main"].input_embedders_parameters["measurements"].scheme = EmbedderScheme.Medium
     agent_params.network_wrappers["main"].input_embedders_parameters["goal"].scheme = EmbedderScheme.Medium
 agent_params.network_wrappers["main"].middleware_parameters.scheme = MiddlewareScheme.Medium
-
 # scale the target measurements according to the paper (dividing by standard deviation)
 agent_params.algorithm.scale_measurements_targets["GameVariable.HEALTH"] = 30.0
 
@@ -75,7 +74,9 @@ agent_params.algorithm.scale_measurements_targets["GameVariable.HEALTH"] = 30.0
 # Environment #
 ###############
 env_params = DoomEnvironmentParameters(
-    level="HEALTH_GATHERING_SUPREME_COACH_LOCAL", additional_inputs=ADDITIONAL_INPUTS, from_pix2pix=from_pix2pix
+    level="HEALTH_GATHERING_SUPREME_NO_SPAWN_COACH_LOCAL",
+    additional_inputs=ADDITIONAL_INPUTS,
+    from_pix2pix=from_pix2pix,
 )
 
 

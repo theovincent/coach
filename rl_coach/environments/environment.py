@@ -41,8 +41,11 @@ class LevelSelection(object):
 
     def __str__(self):
         if self.selected_level is None:
-            logger.screen.error("No level has been selected. Please select a level using the -lvl command line flag, "
-                                "or change the level in the preset.", crash=True)
+            logger.screen.error(
+                "No level has been selected. Please select a level using the -lvl command line flag, "
+                "or change the level in the preset.",
+                crash=True,
+            )
         return self.selected_level
 
 
@@ -58,13 +61,21 @@ class SingleLevelSelection(LevelSelection):
 
     def __str__(self):
         if self.selected_level is None:
-            logger.screen.error("No level has been selected. Please select a level using the -lvl command line flag, "
-                                "or change the level in the preset. \nThe available levels are: \n{}"
-                                .format(', '.join(sorted(self.levels.keys()))), crash=True)
+            logger.screen.error(
+                "No level has been selected. Please select a level using the -lvl command line flag, "
+                "or change the level in the preset. \nThe available levels are: \n{}".format(
+                    ", ".join(sorted(self.levels.keys()))
+                ),
+                crash=True,
+            )
         selected_level = self.selected_level.lower() if self.force_lower else self.selected_level
         if selected_level not in self.levels.keys():
-            logger.screen.error("The selected level ({}) is not part of the available levels ({})"
-                                .format(selected_level, ', '.join(self.levels.keys())), crash=True)
+            logger.screen.error(
+                "The selected level ({}) is not part of the available levels ({})".format(
+                    selected_level, ", ".join(self.levels.keys())
+                ),
+                crash=True,
+            )
         return self.levels[selected_level]
 
 
@@ -110,13 +121,21 @@ class EnvironmentParameters(Parameters):
 
     @property
     def path(self):
-        return 'rl_coach.environments.environment:Environment'
+        return "rl_coach.environments.environment:Environment"
 
 
 class Environment(EnvironmentInterface):
-    def __init__(self, level: LevelSelection, seed: int, frame_skip: int, human_control: bool,
-                 custom_reward_threshold: Union[int, float], visualization_parameters: VisualizationParameters,
-                 target_success_rate: float=1.0, **kwargs):
+    def __init__(
+        self,
+        level: LevelSelection,
+        seed: int,
+        frame_skip: int,
+        human_control: bool,
+        custom_reward_threshold: Union[int, float],
+        visualization_parameters: VisualizationParameters,
+        target_success_rate: float = 1.0,
+        **kwargs
+    ):
         """
         :param level: The environment level. Each environment can have multiple levels
         :param seed: a seed for the random number generator of the environment
@@ -156,7 +175,9 @@ class Environment(EnvironmentInterface):
         self.state_space = self._state_space = None
         self.goal_space = self._goal_space = None
         self.action_space = self._action_space = None
-        self.reward_space = RewardSpace(1, reward_success_threshold=self.reward_success_threshold)  # TODO: add a getter and setter
+        self.reward_space = RewardSpace(
+            1, reward_success_threshold=self.reward_success_threshold
+        )  # TODO: add a getter and setter
 
         self.env_id = str(level)
         self.seed = seed
@@ -282,8 +303,10 @@ class Environment(EnvironmentInterface):
         """
         action = self.action_space.clip_action_to_space(action)
         if self.action_space and not self.action_space.contains(action):
-            raise ValueError("The given action does not match the action space definition. "
-                             "Action = {}, action space definition = {}".format(action, self.action_space))
+            raise ValueError(
+                "The given action does not match the action space definition. "
+                "Action = {}, action space definition = {}".format(action, self.action_space)
+            )
 
         # store the last agent action done and allow passing None actions to repeat the previously done action
         if action is None:
@@ -308,20 +331,16 @@ class Environment(EnvironmentInterface):
         self.total_reward_in_current_episode += self.reward
 
         if self.visualization_parameters.add_rendered_image_to_env_response:
-            self.info['image'] = current_rendered_image
+            self.info["image"] = current_rendered_image
 
-        self.last_env_response = \
-            EnvResponse(
-                reward=self.reward,
-                next_state=self.state,
-                goal=self.goal,
-                game_over=self.done,
-                info=self.info
-            )
+        self.last_env_response = EnvResponse(
+            reward=self.reward, next_state=self.state, goal=self.goal, game_over=self.done, info=self.info
+        )
 
         # store observations for video / gif dumping
-        if self.should_dump_video_of_the_current_episode(episode_terminated=False) and \
-            (self.visualization_parameters.dump_mp4 or self.visualization_parameters.dump_gifs):
+        if self.should_dump_video_of_the_current_episode(episode_terminated=False) and (
+            self.visualization_parameters.dump_mp4 or self.visualization_parameters.dump_gifs
+        ):
             self.last_episode_images.append(self.get_rendered_image())
 
         return self.last_env_response
@@ -370,14 +389,9 @@ class Environment(EnvironmentInterface):
         if self.is_rendered:
             self.render()
 
-        self.last_env_response = \
-            EnvResponse(
-                reward=self.reward,
-                next_state=self.state,
-                goal=self.goal,
-                game_over=self.done,
-                info=self.info
-            )
+        self.last_env_response = EnvResponse(
+            reward=self.reward, next_state=self.state, goal=self.goal, game_over=self.done, info=self.info
+        )
 
         return self.last_env_response
 
@@ -400,7 +414,7 @@ class Environment(EnvironmentInterface):
             for key, idx in sorted(self.key_to_action.items(), key=operator.itemgetter(1)):
                 if key != ():
                     key_names = [self.renderer.get_key_names([k])[0] for k in key]
-                    available_keys.append((self.action_space.descriptions[idx], ' + '.join(key_names)))
+                    available_keys.append((self.action_space.descriptions[idx], " + ".join(key_names)))
         elif type(self.action_space) == DiscreteActionSpace:
             for action in range(self.action_space.shape):
                 available_keys.append(("Action {}".format(action + 1), action + 1))
@@ -437,7 +451,7 @@ class Environment(EnvironmentInterface):
 
     def dump_video_of_last_episode(self):
         frame_skipping = max(1, int(5 / self.frame_skip))
-        file_name = 'episode-{}_score-{}'.format(self.episode_idx, self.total_reward_in_current_episode)
+        file_name = "episode-{}_score-{}".format(self.episode_idx, self.total_reward_in_current_episode)
         fps = 10
         if self.visualization_parameters.dump_gifs:
             logger.create_gif(self.last_episode_images[::frame_skipping], name=file_name, fps=fps)
@@ -490,7 +504,7 @@ class Environment(EnvironmentInterface):
 
         :return: numpy array containing the image that will be rendered to the screen
         """
-        return np.transpose(self.state['observation'], [1, 2, 0])
+        return np.transpose(self.state["observation"], [1, 2, 0])
 
     def get_target_success_rate(self) -> float:
         return self.target_success_rate
