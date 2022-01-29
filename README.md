@@ -25,6 +25,8 @@ In short, adding information helped the agent to learn a better behavior in a sm
 	</tr>
 </table>
 
+You can quickly get access to the colab notebook I used to train pix2pix here: <a href="https://colab.research.google.com/github/theovincent/coach/blob/master/pix2pix/pix2pix.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+
 # Coach
 [![CI](https://img.shields.io/circleci/build/github/IntelLabs/coach/master.svg)](https://circleci.com/gh/IntelLabs/workflows/coach/tree/master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/IntelLabs/coach/blob/master/LICENSE)
